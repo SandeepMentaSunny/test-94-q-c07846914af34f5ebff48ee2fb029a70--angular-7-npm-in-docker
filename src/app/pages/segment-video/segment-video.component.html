@@ -1,0 +1,66 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Segment Video</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="segmentVideoFormGroup">
+      <mat-form-field>
+        <input matInput placeholder="Video Link" required [formControl]="segmentVideoFormGroup.controls['video_link']">
+        <mat-error
+          *ngIf="segmentVideoFormGroup.controls['video_link'].hasError('required') && segmentVideoFormGroup.controls['video_link'].touched">
+          {{AppLiteralsConfig.required}}</mat-error>
+        <mat-error
+          *ngIf="!segmentVideoFormGroup.controls['video_link'].hasError('required') && segmentVideoFormGroup.controls['video_link'].invalid && segmentVideoFormGroup.controls['video_link'].touched">
+          {{AppLiteralsConfig.invalidUrl}}</mat-error>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Select Segment settings</mat-label>
+        <mat-select [formControl]="segmentVideoFormGroup.controls['segmentSettings']" required>
+          <mat-option *ngFor="let setting of settings" [value]="setting['type']">
+            {{setting['val']}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="segmentVideoFormGroup.controls['segmentSettings'].hasError('required')">
+          {{AppLiteralsConfig.required}}</mat-error>
+      </mat-form-field>
+      <mat-form-field *ngIf="segmentVideoFormGroup.controls['segmentSettings'].value === 'interval'">
+        <input matInput required placeholder="Interval duration (in seconds)"
+          [formControl]="segmentVideoFormGroup.controls['interval_duration']" type="number">
+      </mat-form-field>
+      <div *ngIf="segmentVideoFormGroup.controls['segmentSettings'].value === 'range'">
+        <button mat-raised-button color="accent" (click)="addRange()">ADD RANGE DURATION</button>
+        <div formArrayName="interval_range"
+          *ngFor="let range of segmentVideoFormGroup.get('interval_range')['controls']; let i=index">
+          <div [formGroupName]="i">
+            <div class="range-form">
+              <mat-form-field>
+                <input matInput required placeholder="Range duration start" formControlName="start" type="number">
+              </mat-form-field>
+              <mat-form-field>
+                <input matInput required placeholder="Range duration end" formControlName="end" type="number">
+              </mat-form-field>
+              <button mat-raised-button color="warn" (click)="deleteRange(i)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <mat-form-field *ngIf="segmentVideoFormGroup.controls['segmentSettings'].value === 'segments'">
+        <input matInput required placeholder="Number of Segments"
+          [formControl]="segmentVideoFormGroup.controls['no_of_segemnts']" type="number">
+      </mat-form-field>
+      <button mat-raised-button color="accent" (click)="segmentVideo()">SEGMENT VIDEO</button>
+    </form>
+  </mat-card-content>
+</mat-card>
+<div class="card" *ngIf="loadingShimmer">
+  <div class="wrapper">
+    <div class="video animate"></div>
+  </div>
+</div>
+<div class="card" *ngIf="generatedVideoUrls.length > 0">
+  <div *ngFor='let video of generatedVideoUrls'>
+    <video>
+      <source src="video.video_url">
+    </video>
+  </div>
+</div>

@@ -1,0 +1,50 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Combine Video</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="videoCompilationForm">
+      <button mat-raised-button color="accent" (click)="addItems()">ADD RANGE DURATION</button>
+      <div>
+        <div formArrayName="segments"
+          *ngFor="let form of videoCompilationForm.get('segments')['controls']; let i=index">
+          <div [formGroupName]="i">
+            <div class="range-form">
+              <mat-form-field>
+                <input matInput required placeholder="Video Link" formControlName="video_url" type="text">
+              </mat-form-field>
+              <mat-form-field>
+                <input matInput required placeholder="Start at (in seconds)" formControlName="start" type="number">
+              </mat-form-field>
+              <mat-form-field>
+                <input matInput required placeholder="End at (in seconds)" formControlName="end" type="number">
+              </mat-form-field>
+              <button mat-raised-button color="warn" (click)="deleteRange(i)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div  *ngIf="videoCompilationForm.get('segments')['controls'].length > 0">
+        <mat-form-field>
+          <input matInput formControlName="width" placeholder="Video width (in px)" type="number" required>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput formControlName="height" placeholder="Video height (in px)" type="number" required>
+        </mat-form-field>
+      </div>
+      <button mat-raised-button color="accent" [disabled]="videoCompilationForm.invalid"
+        *ngIf="videoCompilationForm.get('segments')['controls'].length > 0" (click)="combineVideo()">COMBINE
+        VIDEO</button>
+    </form>
+  </mat-card-content>
+</mat-card>
+<div class="card" *ngIf="loadingShimmer">
+  <div class="wrapper">
+    <div class="video animate"></div>
+  </div>
+</div>
+<div class="card" *ngIf="videoResponse.length > 0">
+  <video>
+    <source src="videoResponse">
+  </video>
+</div>
